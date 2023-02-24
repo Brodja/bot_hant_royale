@@ -68,11 +68,13 @@ def moveHeroToArena():
   pyautogui.moveTo(START_POSITION_X + 320, START_POSITION_Y + 755)
   time.sleep(2.5)
   pyautogui.mouseUp()
+  print('Пришел')
 
 def checkKillBoss():
   screenFull()
   result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/pickHero.png'), cv2.TM_CCOEFF_NORMED)
   (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
+  print('checkKillBoss', max_y)
   if  max_y < 0.98:
      time.sleep(5)
      checkKillBoss()
@@ -159,20 +161,23 @@ def run(count):
     checkMyPosition()
     moveHeroToArena()
     checkKillBoss()
-    for hero in range(12,21):
+    for hero in range(2,21):
+      print('start hero', hero)
       pickHero(hero)
       awaitGameArena()
       checkMyPosition()
       moveHeroToArena()
-      if hero < 21:
+      if hero < 20:
         checkKillBoss()
-  closeTotal()
-  time.sleep(1)
-  checkAndClose15()
-  time.sleep(1)
-  checkAndPickBonus()
-  time.sleep(1)
-  exit()
+      else:
+        print('Finish')
+    closeTotal()
+    time.sleep(1)
+    checkAndClose15()
+    time.sleep(1)
+    checkAndPickBonus()
+    time.sleep(1)
+    exit()
 
 
 if __name__=="__main__":
