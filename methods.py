@@ -147,11 +147,12 @@ def checkAndClose15():
   (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
   print('checkAndClose15', max_y)
   if  max_y > 0.98:
-    pickHero(12)
+    pickHero('./kraken_image/' + str(14) + '.png', 14)
 
-def checkAndPickBonus():
+def checkAndPickBonus(path):
   screenFull()
-  result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/get_bonus.png'), cv2.TM_CCOEFF_NORMED)
+  # './yeti_image/get_bonus.png'
+  result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread(path), cv2.TM_CCOEFF_NORMED)
   (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
   print(max_y)
   if  max_y > 0.98:
@@ -178,4 +179,5 @@ def skipKrakenFarm():
   pyautogui.click(START_POSITION_X + 260, START_POSITION_Y + 130)
   time.sleep(0.5)
   pyautogui.click(START_POSITION_X + 350, START_POSITION_Y + 625)
+  print('skipKrakenFarm')
 
