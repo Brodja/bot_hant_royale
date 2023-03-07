@@ -44,7 +44,7 @@ def awaitGameArena(path):
   result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread(path), cv2.TM_CCOEFF_NORMED)
   (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
   print('awaitGameArena', max_y)
-  if  max_y < 0.98:
+  if  max_y < 0.95:
      time.sleep(2)
      awaitGameArena(path)
   else:   
@@ -173,7 +173,7 @@ def exitGame():
     pyautogui.click(START_POSITION_X + 270, START_POSITION_Y + 270)
   else:
     time.sleep(1)
-    exit()
+    exitGame()
 
 def skipKrakenFarm():
   pyautogui.click(START_POSITION_X + 260, START_POSITION_Y + 130)
