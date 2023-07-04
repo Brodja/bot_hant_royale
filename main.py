@@ -11,26 +11,31 @@ root.geometry('250x200')
 root.resizable(width=False, height=False)
 
 freeze_support()
+# Логіка кракену
 proc_kraken = Process(target=kraken.start_run)
+# Лоігка йеті
 proc_yeti = Process(target=yeti.start_run)
 
+# Функція для зупинення всіх процесів та їх завершенння
 def stopAndClose():
     global proc_kraken, proc_yeti
     if proc_kraken.is_alive():
+      print('Зупинення кракену')
       proc_kraken.terminate()
       proc_kraken.kill()
     if proc_yeti.is_alive():  
+      print('Йеті кракену')
       proc_yeti.terminate()
       proc_yeti.kill()
     root.destroy()
 
+# кнопки
 btnKraken = Button(root, text='Kraken', bg='green',  width='20', height='3', command=proc_kraken.start)
-btnKraken.pack()
-
 btnYeti = Button(root, text='Yeti', bg='blue', width='20', height='3', command=proc_yeti.start)
-btnYeti.pack()
-
 btnExit = Button(root, text='Exit', bg='red', width='20', height='3', command=stopAndClose)
+
+btnYeti.pack()
+btnKraken.pack()
 btnExit.pack()
 
 if __name__ == '__main__':
