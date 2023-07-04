@@ -2,6 +2,7 @@ from tkinter import *
 import kraken
 import yeti
 from multiprocessing import Process, freeze_support
+# РОЗМІР ЕМУЛЯТОРУ (самої гри) 520 * 920
 
 root = Tk()
 root['bg'] = '#fafafa'
@@ -12,26 +13,29 @@ root.resizable(width=False, height=False)
 
 freeze_support()
 # Логіка кракену
-proc_kraken = Process(target=kraken.start_run)
+# proc_kraken = Process(target=kraken.startKrakenLogic)
 # Лоігка йеті
-proc_yeti = Process(target=yeti.start_run)
+# proc_yeti = Process(target=yeti.start_run)
 
 # Функція для зупинення всіх процесів та їх завершенння
 def stopAndClose():
-    global proc_kraken, proc_yeti
-    if proc_kraken.is_alive():
-      print('Зупинення кракену')
-      proc_kraken.terminate()
-      proc_kraken.kill()
-    if proc_yeti.is_alive():  
-      print('Йеті кракену')
-      proc_yeti.terminate()
-      proc_yeti.kill()
+    print('Вхід у функцію зупинки')
+    # global proc_kraken, proc_yeti
+    # if proc_kraken.is_alive():
+    #   print('Зупинення кракену')
+    #   proc_kraken.terminate()
+    #   proc_kraken.kill()
+    # if proc_yeti.is_alive():  
+    #   print('Йеті кракену')
+    #   proc_yeti.terminate()
+    #   proc_yeti.kill()
     root.destroy()
 
 # кнопки
-btnKraken = Button(root, text='Kraken', bg='green',  width='20', height='3', command=proc_kraken.start)
-btnYeti = Button(root, text='Yeti', bg='blue', width='20', height='3', command=proc_yeti.start)
+# btnKraken = Button(root, text='Kraken', bg='green',  width='20', height='3', command=proc_kraken.start)
+btnKraken = Button(root, text='Kraken', bg='green',  width='20', height='3', command=kraken.startKrakenLogic)
+# btnYeti = Button(root, text='Yeti', bg='blue', width='20', height='3', command=proc_yeti.start)
+btnYeti = Button(root, text='Yeti', bg='blue', width='20', height='3', command=yeti.start_run)
 btnExit = Button(root, text='Exit', bg='red', width='20', height='3', command=stopAndClose)
 
 btnYeti.pack()

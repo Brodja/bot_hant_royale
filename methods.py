@@ -7,45 +7,254 @@ import keyboard
 
 START_POSITION_X = 0
 START_POSITION_Y = 0
-# Получить позицию окна
-def screenFull(mod=False):
-  # ImageGrab.grab(bbox=(1, 1, 1900, 1000)).save('screenshot.png')
+
+# Скрін екрану
+def doScreenshot(mod=False):
+  # Якщо true то усього екрану, інакше частину  
   if (mod):
-    pyautogui.screenshot().save('screenshot.png')
+    pyautogui.screenshot(region=(0, 0, 1920,  1040)).save('screenshot.png')
   else:
     pyautogui.screenshot(region=(START_POSITION_X, START_POSITION_Y, 560,  960)).save('screenshot.png')
 
 
-# Поск своей позиции при старте первого уровня (пока для Ети)
-def findStartPosition():
+# Пошук положення емулятору
+def findPositionEmulator():
   global START_POSITION_X, START_POSITION_Y
-  screenFull(True)
+  # Роблю знімок всього екрану
+  doScreenshot(True)
+  # Шукаю іконку
   result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/blueStacksIcon.png'), cv2.TM_CCOEFF_NORMED)
   (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
+  # Присвоюю координати іконки
   START_POSITION_X = maxloc[0]
   START_POSITION_Y = maxloc[1]
+  # Переміщую мишку до початку
   pyautogui.moveTo(START_POSITION_X, START_POSITION_Y)
   print('START_POSITION_X', START_POSITION_X, 'START_POSITION_Y', START_POSITION_Y)
-# Клик запуска игры
+
+
+# Клік на кнопку старт
 def pressStartGame():
   global START_POSITION_X, START_POSITION_Y
-  pyautogui.click(START_POSITION_X + 270, START_POSITION_Y + 800)
-  print('Start game was pressed')
+  doScreenshot()
+  result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/start_game.png'), cv2.TM_CCOEFF_NORMED)
+  (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
+  print('Пошук кнопки старт', max_y)
+  if  max_y > 0.9:
+    print('Клік на кнопку старт')
+    pyautogui.click(START_POSITION_X + 270, START_POSITION_Y + 800)
+  else:
+    time.sleep(3)
+    pressStartGame()
 
-# Проверка на окно с токенами
+# Перевірка оновлення токенів
 def checkReloadGems():   
-  screenFull()
+  doScreenshot()
   result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/reload_gems.png'), cv2.TM_CCOEFF_NORMED)
+  (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
+  if  max_y > 0.98:
+    pyautogui.click(START_POSITION_X + maxloc[0] + 20, START_POSITION_Y + maxloc[1] + 10) 
+  print('Перевірка на оновлення токенів завершена')    
+
+# Очікування завантаження рівня та розрив інтернету
+def awaitFindUserAndDisconnect():
+  doScreenshot()
+  result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/load_game.png'), cv2.TM_CCOEFF_NORMED)
+  (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
+  print('Пошук напарника', max_y)
+  if  max_y < 0.8:
+    print('Напарник знайдений')
+    disconnect()
+  else:
+    time.sleep(1)
+    awaitFindUserAndDisconnect()
+
+# Розорив інтернету
+def disconnect():
+  pyautogui.keyDown('ctrl')
+  pyautogui.keyDown('shift')
+  pyautogui.press('h')
+  time.sleep(1)
+  pyautogui.press('h') 
+  pyautogui.keyUp('ctrl')
+  pyautogui.keyUp('shift')
+  print('Зв\'язок з інтернером розірвано')    
+
+# Перевірка на завантаження рівня кракена
+def awaitLoadKrakenLvl():
+  doScreenshot()
+  result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./kraken_image/skip_farm.png'), cv2.TM_CCOEFF_NORMED)
+  (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
+  print('Очікування завантаження рівня', max_y)
+  if  max_y < 0.99999:
+    print('Не готово')
+    time.sleep(1)
+    awaitLoadKrakenLvl()
+  else:
+    print('Рівень завантажено')
+
+# Очікування повного завантаження корабля
+def awaitKrakenShip():
+  path = './kraken_image/kraken_ship.png'
+  doScreenshot()
+  result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread(path), cv2.TM_CCOEFF_NORMED)
+  (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
+  print('Пошук завантаження корабля кракена', max_y)
+  if  max_y < 0.9:
+    time.sleep(1)
+    awaitKrakenShip()
+  else:   
+    print('Корабель кракена завантажено') 
+
+# Очікування смерті боса
+def checkKillBoss():
+  doScreenshot()
+  result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/pickHero.png'), cv2.TM_CCOEFF_NORMED)
+  (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
+  if  max_y < 0.98:
+     time.sleep(3)
+     checkKillBoss()
+  else:
+    print('Бос вбитий') 
+
+# Вибір героя
+def pickHero(type, hero):
+  if type == 'kraken':
+    path = './kraken_image/' + str(hero) + '.png'
+  else:
+    path = './yeti_image/' + str(hero) + '.png'
+  # Навести щоб робив скрол 
+  pyautogui.click(START_POSITION_X + 380, START_POSITION_Y + 200)
+  pyautogui.moveTo(START_POSITION_X + 300, START_POSITION_Y + 320)
+  doScreenshot()
+  result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread(path), cv2.TM_CCOEFF_NORMED)
+  (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result) 
+  if  max_y < 0.95: 
+    pyautogui.scroll(-100)  
+    time.sleep(1) 
+    pickHero(type, hero)
+  else:
+      pyautogui.click(START_POSITION_X + maxloc[0] + 10, START_POSITION_Y + maxloc[1] + 10)
+      time.sleep(0.5) 
+      pyautogui.click(START_POSITION_X + 380, START_POSITION_Y + 815)
+      print('Герой успішно обраний')    
+
+# Переміщення до кракену
+def moveToKraken():
+  global START_POSITION_X, START_POSITION_Y
+  pyautogui.moveTo(START_POSITION_X + 260, START_POSITION_Y + 825)
+  pyautogui.mouseDown()
+  pyautogui.moveTo(START_POSITION_X + 260 + 40, START_POSITION_Y + 825 - 70)
+  time.sleep(1)
+  pyautogui.mouseUp()
+  # pyautogui.keyDown('w')
+  # pyautogui.keyDown('d')
+  # time.sleep(0.35)
+  # pyautogui.keyUp('d')
+  # time.sleep(0.15)
+  # pyautogui.keyUp('w')
+  print('Перемістився до кракену')
+
+# Отримання нагороди
+def closeTotal():
+  doScreenshot()
+  result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/total.png'), cv2.TM_CCOEFF_NORMED)
+  (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
+  if  max_y < 0.98: 
+    time.sleep(5) 
+    closeTotal()
+  else:
+    print('Закриття результатів з винагородою', max_y)
+    pyautogui.click(START_POSITION_X + maxloc[0] + 3, START_POSITION_Y + maxloc[1] + 3)
+    time.sleep(1) 
+    pyautogui.click(START_POSITION_X + maxloc[0] + 3, START_POSITION_Y + maxloc[1] + 3)
+
+# Вибір для бонусних відсотків
+def checkAndClose15():
+  doScreenshot()
+  result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/pickHero.png'), cv2.TM_CCOEFF_NORMED)
+  (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
+  if  max_y > 0.98:
+    print('Закриття бонусу в 15%', max_y)
+    pickHero('kraken', 2)
+
+# Перевірка на бонуси каменів у відсотках
+def checkAndPickBonus(path):
+  doScreenshot()
+  result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread(path), cv2.TM_CCOEFF_NORMED)
+  (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
+  if  max_y > 0.98:
+    print('Прийняття бонусних каменів', max_y)
+    pyautogui.click(START_POSITION_X + maxloc[0] + 150, START_POSITION_Y + maxloc[1] + 140)
+    time.sleep(0.5)
+    pyautogui.click(START_POSITION_X + maxloc[0] + 150, START_POSITION_Y + maxloc[1] + 140)
+    time.sleep(0.5)
+    pyautogui.click(START_POSITION_X + maxloc[0] + 150, START_POSITION_Y + maxloc[1] + 140)
+
+def finishDangeon():
+  doScreenshot()
+  result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/exit.png'), cv2.TM_CCOEFF_NORMED)
   (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
   print(max_y)
   if  max_y > 0.98:
-    pyautogui.click(START_POSITION_X + maxloc[0] + 20, START_POSITION_Y + maxloc[1] + 10)   
-  print('Checked new tokens')  
+    pyautogui.click(START_POSITION_X + maxloc[0] + 20, START_POSITION_Y + maxloc[1] + 10)
+    time.sleep(10)
+    pyautogui.click(START_POSITION_X + 270, START_POSITION_Y + 270)
+  else:
+    time.sleep(1)
+    exitGame()
+
+def skipKrakenFarm():
+  pyautogui.click(START_POSITION_X + 260, START_POSITION_Y + 130)
+  time.sleep(0.5)
+  pyautogui.click(START_POSITION_X + 350, START_POSITION_Y + 625)
+  print('Прокачка на кракені пропущена')
+
+def checkBlack():
+  doScreenshot()
+  result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/black.png'), cv2.TM_CCOEFF_NORMED)
+  (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
+  print('checkBlack', max_y)
+  if  max_y > 0.98:
+    print('OK')
+    time.sleep(0.1)
+    checkBlack()
+  else: 
+    print('New try')
+    time.sleep(0.1)
+    checkBlack()
+
+def checkBlue():
+  doScreenshot()
+  result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/blue.png'), cv2.TM_CCOEFF_NORMED)
+  (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
+  print('checkBlue', max_y)
+  if  max_y > 0.98:
+    print('checkBlue OK')
+  else: 
+    print('checkBlue New try')
+    time.sleep(1)
+    checkBlue()
+
+def checkDelBlack():
+  doScreenshot()
+  result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/black.png'), cv2.TM_CCOEFF_NORMED)
+  (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
+  print('checkBlack', max_y)
+  if  max_y > 0.98:
+    print('checkBlack exist')
+    time.sleep(0.3)
+    checkDelBlack()
+  else: 
+    print('checkBlack null')
+
+
+
 
 # Ожидание игрового поля
 def awaitGameArena(path):
   print('Start find game field') 
-  screenFull()
+  doScreenshot()
   result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread(path), cv2.TM_CCOEFF_NORMED)
   (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
   print('awaitGameArena', max_y)
@@ -55,19 +264,8 @@ def awaitGameArena(path):
   else:   
     print('Game field finded')   
 
-# Разорвать соединение
-def disconnect():
-  pyautogui.keyDown('ctrl')
-  pyautogui.keyDown('shift')
-  pyautogui.press('h')
-  time.sleep(2)
-  pyautogui.press('h') 
-  pyautogui.keyUp('ctrl')
-  pyautogui.keyUp('shift')
-  print('Disconnected')
-
 def checkMyPosition():
-  screenFull()
+  doScreenshot()
   result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/healt_field.png'), cv2.TM_CCOEFF_NORMED)
   (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
   print('checkMyPosition', max_y, START_POSITION_X + maxloc[0])
@@ -91,140 +289,3 @@ def moveHeroToArena():
   time.sleep(2.5)
   pyautogui.mouseUp()
   print('Пришел')
-
-# Перемещение к кракену
-def moveToKraken():
-  global START_POSITION_X, START_POSITION_Y
-  pyautogui.moveTo(START_POSITION_X + 260, START_POSITION_Y + 825)
-  pyautogui.mouseDown()
-  pyautogui.moveTo(START_POSITION_X + 260 + 40, START_POSITION_Y + 825 - 70)
-  time.sleep(0.6)
-  pyautogui.mouseUp()
-  # pyautogui.keyDown('w')
-  # pyautogui.keyDown('d')
-  # time.sleep(0.35)
-  # pyautogui.keyUp('d')
-  # time.sleep(0.15)
-  # pyautogui.keyUp('w')
-  print('Moved to kraken')
-
-# Проверка на убийство босса
-def checkKillBoss():
-  screenFull()
-  result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/pickHero.png'), cv2.TM_CCOEFF_NORMED)
-  (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
-  print('checkKillBoss', max_y)
-  if  max_y < 0.98:
-     time.sleep(5)
-     checkKillBoss()
-  else:
-    print('Boss killed')   
-
-# Выбор героя
-def pickHero(path, hero):
-  pyautogui.moveTo(START_POSITION_X + 300, START_POSITION_Y + 400)
-  screenFull()
-  result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread(path), cv2.TM_CCOEFF_NORMED)
-  (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result) 
-  print('pickHero', hero, max_y, maxloc)
-  if  max_y < 0.95: 
-    pyautogui.scroll(-100)  
-    time.sleep(1) 
-    pickHero(path, hero)
-  else:
-      pyautogui.click(START_POSITION_X + maxloc[0] + 10, START_POSITION_Y + maxloc[1] + 10)
-      time.sleep(0.5) 
-      pyautogui.click(START_POSITION_X + 380, START_POSITION_Y + 815)
-
-# получить награду
-def closeTotal():
-  screenFull()
-  result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/total.png'), cv2.TM_CCOEFF_NORMED)
-  (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
-  print('closeTotal', max_y)
-  if  max_y < 0.98: 
-    time.sleep(5) 
-    closeTotal()
-  else:
-    pyautogui.click(START_POSITION_X + maxloc[0] + 3, START_POSITION_Y + maxloc[1] + 3)
-    time.sleep(1) 
-    pyautogui.click(START_POSITION_X + maxloc[0] + 3, START_POSITION_Y + maxloc[1] + 3)
-
-# добавить бонусс
-def checkAndClose15():
-  screenFull()
-  result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/pickHero.png'), cv2.TM_CCOEFF_NORMED)
-  (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
-  print('checkAndClose15', max_y)
-  if  max_y > 0.98:
-    pickHero('./kraken_image/' + str(14) + '.png', 14)
-
-def checkAndPickBonus(path):
-  screenFull()
-  # './yeti_image/get_bonus.png'
-  result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread(path), cv2.TM_CCOEFF_NORMED)
-  (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
-  print(max_y)
-  if  max_y > 0.98:
-    pyautogui.click(START_POSITION_X + maxloc[0] + 150, START_POSITION_Y + maxloc[1] + 140)
-    time.sleep(0.5)
-    pyautogui.click(START_POSITION_X + maxloc[0] + 150, START_POSITION_Y + maxloc[1] + 140)
-    time.sleep(0.5)
-    pyautogui.click(START_POSITION_X + maxloc[0] + 150, START_POSITION_Y + maxloc[1] + 140)
-
-def exitGame():
-  screenFull()
-  result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/exit.png'), cv2.TM_CCOEFF_NORMED)
-  (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
-  print(max_y)
-  if  max_y > 0.98:
-    pyautogui.click(START_POSITION_X + maxloc[0] + 20, START_POSITION_Y + maxloc[1] + 10)
-    time.sleep(10)
-    pyautogui.click(START_POSITION_X + 270, START_POSITION_Y + 270)
-  else:
-    time.sleep(1)
-    exitGame()
-
-def skipKrakenFarm():
-  pyautogui.click(START_POSITION_X + 260, START_POSITION_Y + 130)
-  time.sleep(0.5)
-  pyautogui.click(START_POSITION_X + 350, START_POSITION_Y + 625)
-  print('skipKrakenFarm')
-
-def checkBlack():
-  screenFull()
-  result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/black.png'), cv2.TM_CCOEFF_NORMED)
-  (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
-  print('checkBlack', max_y)
-  if  max_y > 0.98:
-    print('OK')
-    time.sleep(0.1)
-    checkBlack()
-  else: 
-    print('New try')
-    time.sleep(0.1)
-    checkBlack()
-
-def checkBlue():
-  screenFull()
-  result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/blue.png'), cv2.TM_CCOEFF_NORMED)
-  (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
-  print('checkBlue', max_y)
-  if  max_y > 0.98:
-    print('checkBlue OK')
-  else: 
-    print('checkBlue New try')
-    time.sleep(1)
-    checkBlue()
-
-def checkDelBlack():
-  screenFull()
-  result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/black.png'), cv2.TM_CCOEFF_NORMED)
-  (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
-  print('checkBlack', max_y)
-  if  max_y > 0.98:
-    print('checkBlack exist')
-    time.sleep(0.3)
-    checkDelBlack()
-  else: 
-    print('checkBlack null')
