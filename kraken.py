@@ -5,7 +5,7 @@ import time
 # Алгоритм для кракену
 
 def startKrakenLogic():  
-  totalRange = 2
+  totalRange = 20
   print('Запуск кракена')
   # Затримка для початку логіки
   time.sleep(3)
