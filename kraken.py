@@ -14,22 +14,29 @@ def run(count):
     methods.disconnect()
     time.sleep(2)
     methods.skipKrakenFarm()
-    time.sleep(1)
-    methods.awaitGameArena('./kraken_image/game_pult2.png')
-    methods.checkKillBoss()
+    time.sleep(0.5)
+    # methods.awaitGameArena('./kraken_image/game_pult2.png')
+    methods.checkDelBlack()
+    # methods.checkKillBoss()
+    methods.checkBlue()
     for hero in range(2,21):
       methods.pickHero('./kraken_image/' + str(hero) + '.png', hero)
-      methods.awaitGameArena('./kraken_image/game_pult.png')
+      # methods.awaitGameArena('./kraken_image/game_pult.png')
+      time.sleep(0.5)
+      methods.checkDelBlack()
       methods.skipKrakenFarm()
       if hero in [6]:
          time.sleep(1)
-         methods.awaitGameArena('./kraken_image/game_pult2.png')
+        #  methods.awaitGameArena('./kraken_image/game_pult2.png')
+         methods.checkDelBlack()
       else:
         time.sleep(1)
-        methods.awaitGameArena('./kraken_image/game_pult2.png')
+        # methods.awaitGameArena('./kraken_image/game_pult2.png')
+        methods.checkDelBlack()
         methods.moveToKraken()   
       if hero < 20:
-        methods.checkKillBoss()
+        # methods.checkKillBoss()
+        methods.checkBlue()
       else:
         print('Finish')
     methods.closeTotal()
@@ -39,6 +46,9 @@ def run(count):
     methods.checkAndPickBonus('./kraken_image/get_bonus.png')
     time.sleep(1)
     methods.exitGame()
+
+def start_run():
+  run(20)
 
 
 if __name__=="__main__":

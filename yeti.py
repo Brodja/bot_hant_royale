@@ -1,7 +1,6 @@
 import methods
 import time
 # 260 130 && 350 625
-
 def run(count):  
   time.sleep(3)
   methods.findStartPosition()
@@ -12,6 +11,7 @@ def run(count):
     methods.checkReloadGems()
     methods.awaitGameArena('./yeti_image/game_pult.png')
     methods.disconnect()
+    time.sleep(2)
     methods.checkMyPosition()
     methods.moveHeroToArena()
     methods.checkKillBoss()
@@ -32,7 +32,8 @@ def run(count):
     time.sleep(1)
     methods.exitGame()
    
-
+def start_run():
+  run(20)
 
 if __name__=="__main__":
     run(13) 
