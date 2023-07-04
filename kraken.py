@@ -37,6 +37,7 @@ def startKrakenLogic():
       methods.awaitLoadKrakenLvl()
       # Пропуск фарму на кракені
       methods.skipKrakenFarm()
+      time.sleep(1)
       # Очікування повного завантаження боса
       methods.awaitKrakenShip()
       # Перевірка чи треба герою бігти до кракена

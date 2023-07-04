@@ -44,6 +44,7 @@ def pressStartGame():
     print('Клік на кнопку старт')
     pyautogui.click(START_POSITION_X + 270, START_POSITION_Y + 800)
   else:
+    pyautogui.click(START_POSITION_X + 270, START_POSITION_Y + 270)
     time.sleep(3)
     pressStartGame()
 
@@ -95,12 +96,12 @@ def awaitLoadKrakenLvl():
 
 # Очікування повного завантаження корабля
 def awaitKrakenShip():
-  path = './kraken_image/kraken_ship.png'
+  path = './kraken_image/kraken_ship3.png'
   doScreenshot()
   result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread(path), cv2.TM_CCOEFF_NORMED)
   (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
   print('Пошук завантаження корабля кракена', max_y)
-  if  max_y < 0.9:
+  if  max_y < 0.8:
     time.sleep(1)
     awaitKrakenShip()
   else:   
@@ -191,18 +192,20 @@ def checkAndPickBonus(path):
     time.sleep(0.5)
     pyautogui.click(START_POSITION_X + maxloc[0] + 150, START_POSITION_Y + maxloc[1] + 140)
 
+# Завершення підземелля
 def finishDangeon():
   doScreenshot()
   result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/exit.png'), cv2.TM_CCOEFF_NORMED)
   (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
   print(max_y)
   if  max_y > 0.98:
+    print('Завершення підземелля', max_y)
     pyautogui.click(START_POSITION_X + maxloc[0] + 20, START_POSITION_Y + maxloc[1] + 10)
-    time.sleep(10)
-    pyautogui.click(START_POSITION_X + 270, START_POSITION_Y + 270)
+    # time.sleep(10)
+    # pyautogui.click(START_POSITION_X + 270, START_POSITION_Y + 270)
   else:
     time.sleep(1)
-    exitGame()
+    finishDangeon()
 
 def skipKrakenFarm():
   pyautogui.click(START_POSITION_X + 260, START_POSITION_Y + 130)
