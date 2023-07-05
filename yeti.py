@@ -8,6 +8,15 @@ def startYetiLogic():
   totalRange = 20
   # Затримка для початку логіки
   time.sleep(3)
+  # #######################
+  #  #  Запуск емулятору
+  # methods.launchEmulator()
+  #  # Очікування завантаження
+  # methods.awaitLaunchEmulator()
+  #  # Перезапуск гри
+  # methods.restartHuntRoyale()
+  # time.sleep(5)
+  # #######################
   #  Пошук положення емулятору
   methods.findPositionEmulator()
   # Запуск циклу проходжень

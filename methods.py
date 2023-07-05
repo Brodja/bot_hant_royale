@@ -8,6 +8,44 @@ import keyboard
 START_POSITION_X = 0
 START_POSITION_Y = 0
 
+# Запуск емулятору
+def launchEmulator():
+  doScreenshot(True)
+  result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/emulator_icon.png'), cv2.TM_CCOEFF_NORMED)
+  (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
+  pyautogui.click(maxloc[0] + 30, maxloc[1] + 30, clicks=2)
+
+# Очікування завантаження
+def awaitLaunchEmulator():
+  doScreenshot(True)
+  result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/emulator_deck.png'), cv2.TM_CCOEFF_NORMED)
+  (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
+  print('Очікування завантаження емулятора', max_y)
+  if  max_y > 0.9:
+    print('Емулятор завантажено')
+  else:
+    time.sleep(3)
+    awaitLaunchEmulator()
+
+# Перезапуск гри
+def restartHuntRoyale():
+  pyautogui.keyDown('ctrl')
+  pyautogui.keyDown('shift')
+  pyautogui.press('5')
+  pyautogui.keyUp('ctrl')
+  pyautogui.keyUp('shift')
+  print('Меню відкрито') 
+  time.sleep(1)
+  doScreenshot(True)
+  result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/close_game_btn.png'), cv2.TM_CCOEFF_NORMED)
+  (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
+  pyautogui.click(maxloc[0] + 25, maxloc[1] + 25)
+  time.sleep(2)
+  doScreenshot(True)
+  result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/game_icon.png'), cv2.TM_CCOEFF_NORMED)
+  (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
+  pyautogui.click(maxloc[0] + 25, maxloc[1] + 25)
+
 # Скрін екрану
 def doScreenshot(mod=False):
   # Якщо true то усього екрану, інакше частину  
@@ -224,7 +262,7 @@ def awaitLoadYetiLvl():
      awaitLoadYetiLvl()
   else:   
     print('Рівень завантажено')
-    time.sleep(1)
+    time.sleep(3)
 
 # Перевірка позиції та переміщення до боса
 def moveToYeti():
@@ -235,11 +273,11 @@ def moveToYeti():
 
 def checkMyPosition():
   doScreenshot()
-  result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/healt_field.png'), cv2.TM_CCOEFF_NORMED)
+  result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/healt_field2.png'), cv2.TM_CCOEFF_NORMED)
   (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
-  print('Перевірка моєї позиції', max_y, START_POSITION_X + maxloc[0])
-  if  max_y > 0.9:
-    if START_POSITION_X + maxloc[0] > 300:
+  print('Перевірка моєї позиції', max_y, maxloc[0])
+  if  max_y > 0.8:
+    if maxloc[0] > 290:
       print('Потрібно нижче', START_POSITION_X, maxloc[0])
       moveDown()
 
