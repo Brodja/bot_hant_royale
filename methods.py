@@ -207,11 +207,61 @@ def finishDangeon():
     time.sleep(1)
     finishDangeon()
 
+# Пропуск фарму на кракені
 def skipKrakenFarm():
   pyautogui.click(START_POSITION_X + 260, START_POSITION_Y + 130)
   time.sleep(0.5)
   pyautogui.click(START_POSITION_X + 350, START_POSITION_Y + 625)
   print('Прокачка на кракені пропущена')
+
+# Перевірка на завантаження рівня йеті
+def awaitLoadYetiLvl():
+  doScreenshot()
+  result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./yeti_image/game_pult.png'), cv2.TM_CCOEFF_NORMED)
+  (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
+  if  max_y < 0.95:
+     time.sleep(1)
+     awaitLoadYetiLvl()
+  else:   
+    print('Рівень завантажено')
+    time.sleep(1)
+
+# Перевірка позиції та переміщення до боса
+def moveToYeti():
+  # Перевірими на якій ми позиції
+  checkMyPosition()
+  # Переміщення до босу
+  moveHeroToArena()
+
+def checkMyPosition():
+  doScreenshot()
+  result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/healt_field.png'), cv2.TM_CCOEFF_NORMED)
+  (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
+  print('Перевірка моєї позиції', max_y, START_POSITION_X + maxloc[0])
+  if  max_y > 0.9:
+    if START_POSITION_X + maxloc[0] > 300:
+      print('Потрібно нижче', START_POSITION_X, maxloc[0])
+      moveDown()
+
+def moveDown():
+  global START_POSITION_X, START_POSITION_Y
+  pyautogui.moveTo(START_POSITION_X + 260, START_POSITION_Y + 825)
+  pyautogui.mouseDown()
+  pyautogui.moveTo(START_POSITION_X + 320, START_POSITION_Y + 895)
+  time.sleep(0.2)
+  pyautogui.mouseUp()
+  print('Перемістився нижче')
+
+
+def moveHeroToArena():
+  global START_POSITION_X, START_POSITION_Y
+  pyautogui.moveTo(START_POSITION_X + 260, START_POSITION_Y + 825)
+  pyautogui.mouseDown()
+  pyautogui.moveTo(START_POSITION_X + 320, START_POSITION_Y + 755)
+  time.sleep(2.4)
+  pyautogui.mouseUp()
+  print('Прийшов до йеті')  
+
 
 def checkBlack():
   doScreenshot()
@@ -251,44 +301,8 @@ def checkDelBlack():
   else: 
     print('checkBlack null')
 
+   
 
 
 
-# Ожидание игрового поля
-def awaitGameArena(path):
-  print('Start find game field') 
-  doScreenshot()
-  result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread(path), cv2.TM_CCOEFF_NORMED)
-  (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
-  print('awaitGameArena', max_y)
-  if  max_y < 0.95:
-     time.sleep(2)
-     awaitGameArena(path)
-  else:   
-    print('Game field finded')   
 
-def checkMyPosition():
-  doScreenshot()
-  result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/healt_field.png'), cv2.TM_CCOEFF_NORMED)
-  (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
-  print('checkMyPosition', max_y, START_POSITION_X + maxloc[0])
-  if  max_y > 0.9:
-    if START_POSITION_X + maxloc[0] > 300:
-      moveDown()
-
-def moveDown():
-  global START_POSITION_X, START_POSITION_Y
-  pyautogui.moveTo(START_POSITION_X + 260, START_POSITION_Y + 825)
-  pyautogui.mouseDown()
-  pyautogui.moveTo(START_POSITION_X + 320, START_POSITION_Y + 895)
-  time.sleep(0.2)
-  pyautogui.mouseUp()
-
-def moveHeroToArena():
-  global START_POSITION_X, START_POSITION_Y
-  pyautogui.moveTo(START_POSITION_X + 260, START_POSITION_Y + 825)
-  pyautogui.mouseDown()
-  pyautogui.moveTo(START_POSITION_X + 320, START_POSITION_Y + 755)
-  time.sleep(2.5)
-  pyautogui.mouseUp()
-  print('Пришел')

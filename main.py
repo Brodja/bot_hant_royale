@@ -35,7 +35,7 @@ def stopAndClose():
 # btnKraken = Button(root, text='Kraken', bg='green',  width='20', height='3', command=proc_kraken.start)
 btnKraken = Button(root, text='Kraken', bg='green',  width='20', height='3', command=kraken.startKrakenLogic)
 # btnYeti = Button(root, text='Yeti', bg='blue', width='20', height='3', command=proc_yeti.start)
-btnYeti = Button(root, text='Yeti', bg='blue', width='20', height='3', command=yeti.start_run)
+btnYeti = Button(root, text='Yeti', bg='blue', width='20', height='3', command=yeti.startYetiLogic)
 btnExit = Button(root, text='Exit', bg='red', width='20', height='3', command=stopAndClose)
 
 btnYeti.pack()
