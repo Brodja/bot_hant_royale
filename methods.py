@@ -164,7 +164,7 @@ def pickHero(type, hero):
     path = './yeti_image/' + str(hero) + '.png'
   # Навести щоб робив скрол 
   pyautogui.click(START_POSITION_X + 380, START_POSITION_Y + 200)
-  pyautogui.moveTo(START_POSITION_X + 300, START_POSITION_Y + 320)
+  pyautogui.moveTo(START_POSITION_X + 300, START_POSITION_Y + 420)
   doScreenshot()
   result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread(path), cv2.TM_CCOEFF_NORMED)
   (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result) 
@@ -262,7 +262,7 @@ def awaitLoadYetiLvl():
      awaitLoadYetiLvl()
   else:   
     print('Рівень завантажено')
-    time.sleep(3)
+    time.sleep(1)
 
 # Перевірка позиції та переміщення до боса
 def moveToYeti():
@@ -273,11 +273,11 @@ def moveToYeti():
 
 def checkMyPosition():
   doScreenshot()
-  result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/healt_field2.png'), cv2.TM_CCOEFF_NORMED)
+  result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./yeti_image/desk.png'), cv2.TM_CCOEFF_NORMED)
   (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
-  print('Перевірка моєї позиції', max_y, maxloc[0])
+  print('Позиція вказівника', max_y, maxloc[0])
   if  max_y > 0.8:
-    if maxloc[0] > 290:
+    if maxloc[0] > 220:
       print('Потрібно нижче', START_POSITION_X, maxloc[0])
       moveDown()
 
@@ -296,7 +296,7 @@ def moveHeroToArena():
   pyautogui.moveTo(START_POSITION_X + 260, START_POSITION_Y + 825)
   pyautogui.mouseDown()
   pyautogui.moveTo(START_POSITION_X + 320, START_POSITION_Y + 755)
-  time.sleep(2.4)
+  time.sleep(2.3)
   pyautogui.mouseUp()
   print('Прийшов до йеті')  
 
