@@ -13,7 +13,10 @@ import time
     # time.sleep(5)
     # #######################
 
+
+
 def startYetiLogic():  
+  methods.lastUpdate = time.time()
   for roll in range(1, 10):
     totalRange = 3
     timeStart = time.time()
@@ -32,7 +35,7 @@ def startYetiLogic():
       methods.checkReloadGems()
       # Перевірка на знаходження напарника та розрив зв'язку. 
       methods.awaitFindUserAndDisconnect()
-      time.sleep(5)
+      time.sleep(10)
       # Перевірка на завантаження рівня йеті
       methods.awaitLoadYetiLvl()
       # Переміщення до боса
@@ -41,6 +44,7 @@ def startYetiLogic():
       methods.checkKillBoss()
       # Починається цикл вибору героїв
       for hero in range(2,21):
+        methods.lastUpdate = time.time()
         methods.pickHero('yeti', hero)
         methods.awaitLoadYetiLvl()
         # Переміщення до боса

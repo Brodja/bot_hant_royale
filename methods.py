@@ -4,9 +4,24 @@ import pyautogui
 import pyscreenshot as ImageGrab
 import time
 import keyboard
+import yeti
 
 START_POSITION_X = 0
 START_POSITION_Y = 0
+lastUpdate = time.time()
+
+def restart():
+  # Перезапуск гри
+    restartHuntRoyale()
+    yeti.startYetiLogic()
+
+def checkLag():
+  global lastUpdate 
+  print('check lag', time.time() - lastUpdate)
+  if (time.time() - lastUpdate > 200):
+    print('Помилка в алгоритмі, необхідний перезапуск')
+    return restart()
+
 
 # Запуск емулятору
 def launchEmulator():
@@ -121,6 +136,7 @@ def disconnect():
 
 # Перевірка на завантаження рівня кракена
 def awaitLoadKrakenLvl():
+  checkLag()
   doScreenshot()
   result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./kraken_image/skip_farm.png'), cv2.TM_CCOEFF_NORMED)
   (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
@@ -147,6 +163,7 @@ def awaitKrakenShip():
 
 # Очікування смерті боса
 def checkKillBoss():
+  checkLag()
   doScreenshot()
   result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/pickHero.png'), cv2.TM_CCOEFF_NORMED)
   (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
@@ -158,6 +175,7 @@ def checkKillBoss():
 
 # Вибір героя
 def pickHero(type, hero):
+  checkLag()
   if type == 'kraken':
     path = './kraken_image/' + str(hero) + '.png'
   else:
@@ -196,6 +214,7 @@ def moveToKraken():
 
 # Отримання нагороди
 def closeTotal():
+  checkLag()
   doScreenshot()
   result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/total.png'), cv2.TM_CCOEFF_NORMED)
   (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
@@ -232,6 +251,7 @@ def checkAndPickBonus(path):
 
 # Завершення підземелля
 def finishDangeon():
+  checkLag()
   doScreenshot()
   result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/exit.png'), cv2.TM_CCOEFF_NORMED)
   (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
@@ -254,6 +274,7 @@ def skipKrakenFarm():
 
 # Перевірка на завантаження рівня йеті
 def awaitLoadYetiLvl():
+  checkLag()
   doScreenshot()
   result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./yeti_image/game_pult.png'), cv2.TM_CCOEFF_NORMED)
   (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)

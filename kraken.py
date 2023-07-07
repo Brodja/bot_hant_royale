@@ -6,7 +6,9 @@ import time
 
 def startKrakenLogic():  
   for roll in range(1, 10):
+    methods.lastUpdate = time.time()
     totalRange = 3
+    timeStart = time.time()
     print('Запуск кракена')
     # Затримка для початку логіки
     time.sleep(3)
@@ -22,6 +24,7 @@ def startKrakenLogic():
       methods.checkReloadGems()
       # Перевірка на знаходження напарника та розрив зв'язку. 
       methods.awaitFindUserAndDisconnect()
+      time.sleep(10)
       # Перевірка на завантаження рівня
       methods.awaitLoadKrakenLvl()
       # Пропуск фарму на кракені
@@ -33,6 +36,7 @@ def startKrakenLogic():
       methods.checkKillBoss()
       # Починається цикл вибору героїв
       for hero in range(2,21):
+        methods.lastUpdate = time.time()
         methods.pickHero('kraken', hero)
         # Перевірка на завантаження рівня
         methods.awaitLoadKrakenLvl()
@@ -60,6 +64,7 @@ def startKrakenLogic():
       time.sleep(1)
       # Завершення підземелля
       methods.finishDangeon()
+      print('ВСЬОГО РІВЕНЬ -',round(time.time() - timeStart), 's | ', round((time.time() - timeStart) / 60, 2), 'm') 
       time.sleep(5)
     # Перезапуск гри
     methods.restartHuntRoyale()
