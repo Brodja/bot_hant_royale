@@ -5,6 +5,7 @@ import pyscreenshot as ImageGrab
 import time
 import keyboard
 import yeti
+import kraken
 
 START_POSITION_X = 0
 START_POSITION_Y = 0
@@ -13,7 +14,8 @@ lastUpdate = time.time()
 def restart():
   # Перезапуск гри
     restartHuntRoyale()
-    yeti.startYetiLogic()
+    # yeti.startYetiLogic()
+    kraken.startKrakenLogic()
 
 def checkLag():
   global lastUpdate 
@@ -85,9 +87,19 @@ def findPositionEmulator():
   pyautogui.moveTo(START_POSITION_X, START_POSITION_Y)
   print('START_POSITION_X', START_POSITION_X, 'START_POSITION_Y', START_POSITION_Y)
 
+def checkShop():
+  global START_POSITION_X, START_POSITION_Y
+  doScreenshot()
+  result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/no.png'), cv2.TM_CCOEFF_NORMED)
+  (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
+  print('Пошук магазину', max_y)
+  if  max_y > 0.9:
+    print('Закрить магазин')
+    pyautogui.click(START_POSITION_X + maxloc[0] + 20, START_POSITION_Y + maxloc[1] + 10) 
 
 # Клік на кнопку старт
 def pressStartGame():
+  checkShop()
   global START_POSITION_X, START_POSITION_Y
   doScreenshot()
   result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/start_game.png'), cv2.TM_CCOEFF_NORMED)
