@@ -6,20 +6,26 @@ import time
 import keyboard
 import yeti
 import kraken
+import chaos
 
 START_POSITION_X = 0
 START_POSITION_Y = 0
 lastUpdate = time.time()
+running = True
 
 def restart():
   # Перезапуск гри
     restartHuntRoyale()
     # yeti.startYetiLogic()
-    kraken.startKrakenLogic()
-
+    # kraken.startKrakenLogic()
+    chaos.startChaosLogic()
+    
 def checkLag():
-  global lastUpdate 
+  global lastUpdate, running 
   print('check lag', time.time() - lastUpdate)
+  if running == False:
+    print('Stop logic')
+    return
   if (time.time() - lastUpdate > 200):
     print('Помилка в алгоритмі, необхідний перезапуск')
     return restart()
@@ -89,6 +95,7 @@ def findPositionEmulator():
 
 def checkShop():
   global START_POSITION_X, START_POSITION_Y
+  checkLag()
   doScreenshot()
   result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/no.png'), cv2.TM_CCOEFF_NORMED)
   (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
@@ -99,8 +106,9 @@ def checkShop():
 
 # Клік на кнопку старт
 def pressStartGame():
-  checkShop()
   global START_POSITION_X, START_POSITION_Y
+  findPositionEmulator()
+  checkShop()
   doScreenshot()
   result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/start_game.png'), cv2.TM_CCOEFF_NORMED)
   (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
@@ -375,5 +383,112 @@ def checkDelBlack():
    
 
 
+# Функція для підбору кракенв в чаосі
+def pickChaosKraken():
+  # Жмем почати
+  pressStartGame()
+  # Чекаэмо завантаження
+  awaitPickField()
+  # Перевіряємо чи кракен
+  check = checkKraken()
+  if check == False:
+    pickChaosKraken()
+  else:
+   print('Обираємо героя') 
+
+# Клік на кнопку старт
+def awaitPickField():
+  global START_POSITION_X, START_POSITION_Y
+  doScreenshot()
+  result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./chaos_image/pick_field.png'), cv2.TM_CCOEFF_NORMED)
+  (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
+  print('Очікуємо завантаження', max_y)
+  if  max_y > 0.9:
+    print('Меню завантажено')
+  else:
+    time.sleep(1)
+    awaitPickField()
+
+# Перевіряємо чи кракен 
+def checkKraken():
+  global START_POSITION_X, START_POSITION_Y
+  doScreenshot()
+  result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./chaos_image/kraken_lvl.png'), cv2.TM_CCOEFF_NORMED)
+  (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
+  print('Перевірка чи кракен', max_y)
+  if  max_y > 0.9:
+    print('Кракен - можна обирати героя')
+    return True
+  else:
+    print('Не кракен - перезапуск')
+    pyautogui.click(START_POSITION_X + 240, START_POSITION_Y + 100)
+    time.sleep(1)
+    return False
+
+# Очікування завантаження
+def awaitLoadKrakenShip():
+  global START_POSITION_X, START_POSITION_Y
+  doScreenshot()
+  result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./chaos_image/load_lvl.png'), cv2.TM_CCOEFF_NORMED)
+  (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
+  if  max_y > 0.9:
+    print('Завантаження триває')
+    time.sleep(0.3)
+    awaitLoadKrakenShip()
+  else:
+    print('Завантаження завершено')
+
+# Переміщення до кракену з пушкою
+def moveToKraken2():
+  global START_POSITION_X, START_POSITION_Y
+  pyautogui.moveTo(START_POSITION_X + 260, START_POSITION_Y + 400)
+  pyautogui.mouseDown()
+  pyautogui.moveTo(START_POSITION_X + 260 - 30, START_POSITION_Y + 400 - 50)
+  time.sleep(0.2)
+  pyautogui.moveTo(START_POSITION_X + 260 + 50, START_POSITION_Y + 400 - 40)
+  time.sleep(0.3)
+  pyautogui.mouseUp()
+  print('Перемістився до кракену')  
+
+# Очікуємо фінішу
+def awaitFinishChaos():
+  checkLag()
+  global START_POSITION_X, START_POSITION_Y
+  doScreenshot()
+  result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./chaos_image/finish lvl.png'), cv2.TM_CCOEFF_NORMED)
+  (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
+  if  max_y > 0.9:
+    print('Кракен вбитий')
+  else:
+    time.sleep(3)
+    awaitFinishChaos()
+
+# Очікуємо фінішу
+def finishChaos():
+  global START_POSITION_X, START_POSITION_Y
+  time.sleep(0.5)
+  pyautogui.click(START_POSITION_X + 120, START_POSITION_Y + 430)
+  time.sleep(0.5)
+  pyautogui.click(START_POSITION_X + 380, START_POSITION_Y + 810)
+  time.sleep(1)
+  awaitLoadKrakenShip()
+  time.sleep(0.5)
+  pyautogui.click(START_POSITION_X + 30, START_POSITION_Y + 65)
+  time.sleep(0.5)
+  pyautogui.click(START_POSITION_X + 250, START_POSITION_Y + 730)
 
 
+# Переміщення до кракену з пушкою
+def moveToKraken3():
+  global START_POSITION_X, START_POSITION_Y
+  print('in move: ',START_POSITION_X, START_POSITION_Y)
+  pyautogui.moveTo(START_POSITION_X + 260, START_POSITION_Y + 400)
+  time.sleep(0.1)
+  pyautogui.mouseDown()
+  time.sleep(0.1)
+  pyautogui.moveTo(START_POSITION_X + 260 - 30, START_POSITION_Y + 400 - 50)
+  time.sleep(1.5)
+  pyautogui.moveTo(START_POSITION_X + 260 + 50, START_POSITION_Y + 400 - 40)
+  time.sleep(0.5)
+  pyautogui.mouseUp()
+  print('Перемістився до кракену')  
