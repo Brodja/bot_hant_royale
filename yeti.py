@@ -13,6 +13,7 @@ import time
     # time.sleep(5)
     # #######################
 
+# 1439
 
 
 def startYetiLogic():  

@@ -16,9 +16,9 @@ running = True
 def restart():
   # Перезапуск гри
     restartHuntRoyale()
-    # yeti.startYetiLogic()
+    yeti.startYetiLogic()
     # kraken.startKrakenLogic()
-    chaos.startChaosLogic()
+    # chaos.startChaosLogic()
     
 def checkLag():
   global lastUpdate, running 
@@ -187,7 +187,7 @@ def checkKillBoss():
   doScreenshot()
   result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/pickHero.png'), cv2.TM_CCOEFF_NORMED)
   (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
-  if  max_y < 0.98:
+  if  max_y < 0.9:
      time.sleep(3)
      checkKillBoss()
   else:
@@ -199,14 +199,16 @@ def pickHero(type, hero):
   if type == 'kraken':
     path = './kraken_image/' + str(hero) + '.png'
   else:
-    path = './yeti_image/' + str(hero) + '.png'
+    # path = './yeti_image/' + str(hero) + '.png'
+    path = './ivent/' + str(hero) + '.png'
   # Навести щоб робив скрол 
   pyautogui.click(START_POSITION_X + 380, START_POSITION_Y + 200)
   pyautogui.moveTo(START_POSITION_X + 300, START_POSITION_Y + 420)
   doScreenshot()
   result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread(path), cv2.TM_CCOEFF_NORMED)
   (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result) 
-  if  max_y < 0.95: 
+  print('Герой - ', max_y)   
+  if  max_y < 0.9: 
     pyautogui.scroll(-100)  
     time.sleep(1) 
     pickHero(type, hero)
@@ -238,7 +240,7 @@ def closeTotal():
   doScreenshot()
   result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/total.png'), cv2.TM_CCOEFF_NORMED)
   (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
-  if  max_y < 0.98: 
+  if  max_y < 0.9: 
     time.sleep(5) 
     closeTotal()
   else:
@@ -252,16 +254,16 @@ def checkAndClose15():
   doScreenshot()
   result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/pickHero.png'), cv2.TM_CCOEFF_NORMED)
   (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
-  if  max_y > 0.98:
+  if  max_y > 0.9:
     print('Закриття бонусу в 15%', max_y)
-    pickHero('kraken', 2)
+    pickHero('kraken', 11)
 
 # Перевірка на бонуси каменів у відсотках
 def checkAndPickBonus(path):
   doScreenshot()
   result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread(path), cv2.TM_CCOEFF_NORMED)
   (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
-  if  max_y > 0.98:
+  if  max_y > 0.9:
     print('Прийняття бонусних каменів', max_y)
     pyautogui.click(START_POSITION_X + maxloc[0] + 150, START_POSITION_Y + maxloc[1] + 140)
     time.sleep(0.5)
@@ -276,7 +278,7 @@ def finishDangeon():
   result = cv2.matchTemplate(cv2.imread('screenshot.png'), cv2.imread('./image/exit.png'), cv2.TM_CCOEFF_NORMED)
   (min_x, max_y, minloc, maxloc) = cv2.minMaxLoc(result)
   print(max_y)
-  if  max_y > 0.98:
+  if  max_y > 0.9:
     print('Завершення підземелля', max_y)
     pyautogui.click(START_POSITION_X + maxloc[0] + 20, START_POSITION_Y + maxloc[1] + 10)
     # time.sleep(10)
@@ -475,7 +477,7 @@ def finishChaos():
   time.sleep(0.5)
   pyautogui.click(START_POSITION_X + 30, START_POSITION_Y + 65)
   time.sleep(0.5)
-  pyautogui.click(START_POSITION_X + 250, START_POSITION_Y + 730)
+  pyautogui.click(START_POSITION_X + 250, START_POSITION_Y + 780)
 
 
 # Переміщення до кракену з пушкою

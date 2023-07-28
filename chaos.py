@@ -3,7 +3,7 @@ import time
 
 # кубки - 2 338 715
 # поверхи - 83
-# кракен - 9728 - 8573 = 1155 - 35 р
+# кракен - 13589 - 9728 = 3861 - 117 р
 # лаба - 5444 - 3594 = 1850
 # час 17:30 - 18:33 = ? минут
 
@@ -24,7 +24,7 @@ def startChaosLogic():
         # Підбір кракену
         methods.pickChaosKraken()
         # Вибір анубіса  
-        methods.pickHero('kraken', 17) #17 13
+        methods.pickHero('kraken', 22) #17 13
         time.sleep(1)
         # Очікування завантаження
         methods.awaitLoadKrakenShip()
@@ -39,7 +39,7 @@ def startChaosLogic():
         methods.finishChaos()
         # Отримання нагороди
         methods.closeTotal()
-        time.sleep(1)
+        time.sleep(3)
         # Вибір для бонусних відсотків
         methods.checkAndClose15()
         time.sleep(1)
